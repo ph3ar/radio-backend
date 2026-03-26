@@ -1,0 +1,4 @@
+## 2025-02-12 - Missing Authentication on State-Modifying Endpoint
+**Vulnerability:** The `DELETE /api/events` endpoint clears all events from the event store and was completely unauthenticated. Anyone could issue a DELETE request and erase the entire system history.
+**Learning:** This architectural gap highlights that when creating state-modifying endpoints (especially those intended for admin or internal use), authentication is often overlooked if the primary focus was building a functional MVP. It exposes the application to deliberate or accidental DoS.
+**Prevention:** Always implement an authentication layer or require a specific secret (e.g., `ADMIN_API_KEY`) for any endpoint that modifies or deletes state. Use an established authorization mechanism and ensure tests assert `401 Unauthorized` for unauthenticated access.

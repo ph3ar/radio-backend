@@ -91,7 +91,18 @@ export async function GET(request: Request) {
 }
 
 // DELETE - clear all events
-export async function DELETE() {
+export async function DELETE(request: Request) {
+  // Require an admin API key for destructive actions
+  const authHeader = request.headers.get("Authorization")
+  const apiKey = process.env.ADMIN_API_KEY
+
+  if (!apiKey || authHeader !== `Bearer ${apiKey}`) {
+    return NextResponse.json(
+      { error: "Unauthorized" },
+      { status: 401 }
+    )
+  }
+
   eventStore.events = []
   eventStore.lastUpdated = Date.now()
   
