@@ -1,5 +1,22 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import type { RobotEvent } from "@/lib/types"
+
+const EventSchema = z.object({
+  time: z.string().max(100).optional(),
+  badge_code: z.string().max(100).optional(),
+  destination: z.string().max(200).optional(),
+  duration_sec: z.number().optional(),
+  event_type: z.string().max(100),
+  goto_outcome: z.string().max(100).optional(),
+  robot_id: z.string().max(100),
+  task_id: z.string().max(100).optional(),
+})
+
+const EventPayloadSchema = z.union([
+  EventSchema,
+  z.array(EventSchema).max(100),
+])
 
 // Extended event with sequence number for tracking
 type StoredEvent = RobotEvent & { _seq: number }
@@ -22,16 +39,24 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
     
+    // Validate payload shape and length to prevent DoS/Memory issues
+    const parsedBody = EventPayloadSchema.safeParse(body)
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        { error: "Invalid request format or payload too large" },
+        { status: 400 }
+      )
+    }
+
+    const validatedData = parsedBody.data
+
     // Handle single event or array of events
-    const newEvents: RobotEvent[] = Array.isArray(body) ? body : [body]
+    const newEvents: RobotEvent[] = Array.isArray(validatedData) ? validatedData : [validatedData]
     
     const addedEvents: StoredEvent[] = []
     
     // Validate and add events with unique sequence numbers
     for (const event of newEvents) {
-      if (!event.robot_id || !event.event_type) {
-        continue // Skip invalid events
-      }
       
       eventStore.sequenceCounter++
       
