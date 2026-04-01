@@ -218,6 +218,7 @@ export default function PH3ARRadio() {
               <div className="flex flex-col items-center py-8">
                 <Button
                   onClick={handlePlayPause}
+                  aria-label={isPlaying ? "Pause radio" : "Play radio"}
                   className={`w-24 h-24 rounded-full transition-all duration-300 ${
                     isPlaying 
                       ? "bg-white/5 hover:bg-white/10 border border-cyan-500/30" 
@@ -240,11 +241,13 @@ export default function PH3ARRadio() {
                   <button 
                     type="button"
                     onClick={() => setIsMuted(!isMuted)}
+                    aria-label={isMuted ? "Unmute volume" : "Mute volume"}
                     className="text-white/40 hover:text-white/70 transition-colors"
                   >
                     {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>
                   <Slider
+                    aria-label="Volume"
                     value={[isMuted ? 0 : volume]}
                     onValueChange={(v) => { setVolume(v[0]); setIsMuted(false) }}
                     max={100}
