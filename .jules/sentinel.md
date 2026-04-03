@@ -1,4 +1,4 @@
-## 2025-02-12 - Missing Input Validation in API Endpoint
-**Vulnerability:** The `/api/events` POST endpoint lacked input size validation and strict typing for nested array elements. A massive array payload could be sent and processed in a loop, or overly long strings could consume memory, risking Denial of Service (DoS) and application instability.
-**Learning:** Even though Next.js has a body size limit, looping through untyped and unvalidated JSON arrays can lead to significant resource consumption (1MB of small array items could be 10,000+ loops). Additionally, skipping string length checks or using `Array.isArray(body) ? body : [body]` without further bounds leads to DoS vulnerability.
-**Prevention:** Always use a validation library like `zod` to validate API boundaries. Ensure array properties have `.max()` length constraints and strings have proper `.max()` limits to fail securely on malicious requests.
+## 2025-02-12 - Missing Authentication on State-Modifying Endpoint
+**Vulnerability:** The `DELETE /api/events` endpoint clears all events from the event store and was completely unauthenticated. Anyone could issue a DELETE request and erase the entire system history.
+**Learning:** This architectural gap highlights that when creating state-modifying endpoints (especially those intended for admin or internal use), authentication is often overlooked if the primary focus was building a functional MVP. It exposes the application to deliberate or accidental DoS.
+**Prevention:** Always implement an authentication layer or require a specific secret (e.g., `ADMIN_API_KEY`) for any endpoint that modifies or deletes state. Use an established authorization mechanism and ensure tests assert `401 Unauthorized` for unauthenticated access.
