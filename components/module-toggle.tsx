@@ -47,6 +47,7 @@ export function ModuleToggle({ module, isEnabled, onToggle }: ModuleToggleProps)
         <Switch
           checked={isEnabled}
           onCheckedChange={onToggle}
+          aria-label={`Toggle ${module.name} module`}
           className="data-[state=checked]:bg-cyan-500 scale-90"
         />
       </div>
