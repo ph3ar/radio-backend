@@ -1,0 +1,3 @@
+## 2024-05-18 - React Canvas Animation Teardowns
+**Learning:** `requestAnimationFrame` loops in React `useEffect` should not depend on rapidly changing state like `health` or `events`. Doing so causes the canvas loop to tear down and remount on every state change, destroying the continuous loop. Also performing O(N) operations (e.g., Set conversions) inside a 60fps `draw` loop causes unnecessary CPU strain.
+**Action:** Always store rapidly updating values in `useRef` to allow the canvas loop to read them silently without triggering a re-render. Derive expensive calculations in a separate `useEffect` that listens to those state variables and writes to the refs.

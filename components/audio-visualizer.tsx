@@ -25,6 +25,25 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
   }>>([])
   const robotPositionsRef = useRef<Map<string, { angle: number; radius: number }>>(new Map())
 
+  // Optimize: Avoid re-rendering canvas loop on every state change
+  const stateRef = useRef({ isPlaying, health })
+  const eventsDataRef = useRef({
+    uniqueRobots: [] as string[],
+    recentEvents: [] as RobotEvent[]
+  })
+
+  // Update refs without triggering loop teardown
+  useEffect(() => {
+    stateRef.current = { isPlaying, health }
+  }, [isPlaying, health])
+
+  useEffect(() => {
+    eventsDataRef.current = {
+      uniqueRobots: [...new Set(events.map(e => e.robot_id))],
+      recentEvents: events.slice(0, 3)
+    }
+  }, [events])
+
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -50,7 +69,8 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
       const centerX = canvas.width / 2
       const centerY = canvas.height / 2
 
-      if (isPlaying) {
+      const currentState = stateRef.current
+      if (currentState.isPlaying) {
         // Central glow - color shifts with health
         const glowRadius = 250 + Math.sin(timeRef.current * 0.3) * 30
         const gradient = ctx.createRadialGradient(
@@ -59,14 +79,14 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
         )
         
         // Color shifts: cyan (healthy) -> orange (warning) -> red (critical)
-        const healthColor = health > 0.6 
-          ? `rgba(34, 211, 238, ${0.04 + health * 0.04})` 
-          : health > 0.3 
-            ? `rgba(251, 191, 36, ${0.04 + health * 0.04})`
+        const healthColor = currentState.health > 0.6
+          ? `rgba(34, 211, 238, ${0.04 + currentState.health * 0.04})`
+          : currentState.health > 0.3
+            ? `rgba(251, 191, 36, ${0.04 + currentState.health * 0.04})`
             : `rgba(239, 68, 68, ${0.06})`
         
         gradient.addColorStop(0, healthColor)
-        gradient.addColorStop(0.4, health > 0.5 ? "rgba(20, 184, 166, 0.03)" : "rgba(180, 83, 9, 0.03)")
+        gradient.addColorStop(0.4, currentState.health > 0.5 ? "rgba(20, 184, 166, 0.03)" : "rgba(180, 83, 9, 0.03)")
         gradient.addColorStop(1, "transparent")
         
         ctx.beginPath()
@@ -76,20 +96,20 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
 
         // Orbital rings - wobble more when health is low
         for (let i = 0; i < 4; i++) {
-          const wobble = (1 - health) * 20 * Math.sin(timeRef.current * 2 + i)
+          const wobble = (1 - currentState.health) * 20 * Math.sin(timeRef.current * 2 + i)
           const ringRadius = 120 + i * 60 + wobble
           const alpha = 0.04 - i * 0.008
           
           ctx.beginPath()
           ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2)
-          const ringColor = health > 0.5 ? "34, 211, 238" : health > 0.3 ? "251, 191, 36" : "239, 68, 68"
+          const ringColor = currentState.health > 0.5 ? "34, 211, 238" : currentState.health > 0.3 ? "251, 191, 36" : "239, 68, 68"
           ctx.strokeStyle = `rgba(${ringColor}, ${alpha})`
           ctx.lineWidth = 1
           ctx.stroke()
         }
 
         // Robot dots - each robot gets a consistent position
-        const uniqueRobots = [...new Set(events.map(e => e.robot_id))]
+        const { uniqueRobots, recentEvents } = eventsDataRef.current
         
         uniqueRobots.forEach((robotId, i) => {
           // Initialize or get robot position
@@ -121,7 +141,6 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
         })
 
         // Spawn particles for recent events
-        const recentEvents = events.slice(0, 3)
         recentEvents.forEach((event) => {
           if (Math.random() < 0.1) {
             const pos = robotPositionsRef.current.get(event.robot_id)
@@ -168,7 +187,7 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
       window.removeEventListener("resize", resize)
       cancelAnimationFrame(animationRef.current)
     }
-  }, [isPlaying, events, health])
+  }, []) // Empty dependency array: setup canvas once, read state from refs
 
   return (
     <canvas

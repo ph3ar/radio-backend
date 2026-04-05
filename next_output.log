@@ -1,0 +1,10 @@
+
+> backend-radio-boilerplate@0.0.1 start /app
+> next start
+
+   ▲ Next.js 16.0.10
+   - Local:         http://localhost:3000
+   - Network:       http://192.168.0.2:3000
+
+ ✓ Starting...
+ ✓ Ready in 289ms
