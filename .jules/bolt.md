@@ -1,0 +1,3 @@
+## 2025-04-10 - [Avoid deriving state in canvas render loop]
+**Learning:** [In React components that use canvas with requestAnimationFrame, computing derived state directly inside the render loop (like map, Set, slice operations on props) leads to severe performance degradation because it runs 60 times a second. In AudioVisualizer, calculating uniqueRobots and recentEvents during the loop caused excessive CPU overhead and GC pressure.]
+**Action:** [Always compute derived state from props outside the requestAnimationFrame loop, taking advantage of the fact that React props (like `events`) are constant during that specific closure of the loop, ensuring complex operations only run when props actually update.]
