@@ -39,6 +39,11 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
     resize()
     window.addEventListener("resize", resize)
 
+    // ⚡ Bolt: Calculate derived state once per events update rather than 60 times a second in the render loop.
+    // This removes ~60 map/Set/slice operations per second, reducing CPU usage and garbage collection pressure.
+    const uniqueRobots = [...new Set(events.map(e => e.robot_id))]
+    const recentEvents = events.slice(0, 3)
+
     const draw = () => {
       animationRef.current = requestAnimationFrame(draw)
       timeRef.current += 0.008
@@ -89,8 +94,6 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
         }
 
         // Robot dots - each robot gets a consistent position
-        const uniqueRobots = [...new Set(events.map(e => e.robot_id))]
-        
         uniqueRobots.forEach((robotId, i) => {
           // Initialize or get robot position
           if (!robotPositionsRef.current.has(robotId)) {
@@ -121,7 +124,6 @@ export function AudioVisualizer({ isPlaying, events, health = 0.7 }: AudioVisual
         })
 
         // Spawn particles for recent events
-        const recentEvents = events.slice(0, 3)
         recentEvents.forEach((event) => {
           if (Math.random() < 0.1) {
             const pos = robotPositionsRef.current.get(event.robot_id)
