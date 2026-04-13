@@ -95,7 +95,8 @@ await fetch("${baseUrl}/api/events", {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
+        aria-expanded={isOpen}
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] focus-visible:bg-white/[0.04] focus-visible:outline-none transition-colors"
       >
         <div className="flex items-center gap-2">
           <Code className="w-4 h-4 text-cyan-400" />
@@ -122,6 +123,7 @@ await fetch("${baseUrl}/api/events", {
                 variant="ghost"
                 size="sm"
                 className="h-6 w-6 p-0"
+                aria-label={copied === "endpoint" ? "Copied" : "Copy endpoint"}
                 onClick={() => copyToClipboard(`${baseUrl}/api/events`, "endpoint")}
               >
                 {copied === "endpoint" ? (
@@ -143,6 +145,7 @@ await fetch("${baseUrl}/api/events", {
                 variant="ghost"
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
+                aria-label={copied === "curl" ? "Copied" : "Copy cURL example"}
                 onClick={() => copyToClipboard(curlExample, "curl")}
               >
                 {copied === "curl" ? (
@@ -164,6 +167,7 @@ await fetch("${baseUrl}/api/events", {
                 variant="ghost"
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
+                aria-label={copied === "python" ? "Copied" : "Copy Python example"}
                 onClick={() => copyToClipboard(pythonExample, "python")}
               >
                 {copied === "python" ? (
@@ -185,6 +189,7 @@ await fetch("${baseUrl}/api/events", {
                 variant="ghost"
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
+                aria-label={copied === "js" ? "Copied" : "Copy JavaScript example"}
                 onClick={() => copyToClipboard(jsExample, "js")}
               >
                 {copied === "js" ? (
