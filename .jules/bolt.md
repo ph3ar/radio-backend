@@ -1,0 +1,3 @@
+## 2026-04-24 - Preventing Unnecessary Allocations in Canvas Animation Loops
+**Learning:** Found O(N) array mapping and Set creation inside a `requestAnimationFrame` loop in `AudioVisualizer`. This is a critical performance anti-pattern in React canvas components, as it creates constant garbage collection pressure (allocating new arrays and sets 60 times a second) when the underlying data (`events`) only changes every few seconds.
+**Action:** Always pre-compute derived data (like `uniqueRobots` or sliced arrays) outside the `requestAnimationFrame` loop, leveraging the fact that React `useEffect` will naturally restart the loop when dependencies change.
