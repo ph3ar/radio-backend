@@ -242,7 +242,7 @@ export default function PH3ARRadio() {
                     type="button"
                     onClick={() => setIsMuted(!isMuted)}
                     aria-label={isMuted ? "Unmute volume" : "Mute volume"}
-                    className="text-white/40 hover:text-white/70 transition-colors"
+                    className="text-white/40 hover:text-white/70 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50 rounded"
                   >
                     {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                   </button>

@@ -95,7 +95,9 @@ await fetch("${baseUrl}/api/events", {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition-colors"
+        aria-expanded={isOpen}
+        aria-controls="api-docs-content"
+        className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500/50"
       >
         <div className="flex items-center gap-2">
           <Code className="w-4 h-4 text-cyan-400" />
@@ -109,7 +111,7 @@ await fetch("${baseUrl}/api/events", {
       </button>
 
       {isOpen && (
-        <div className="px-4 pb-4 space-y-4 border-t border-white/5 pt-4">
+        <div id="api-docs-content" className="px-4 pb-4 space-y-4 border-t border-white/5 pt-4">
           <div>
             <p className="text-xs text-white/50 mb-3">
               Send robot events to make the radio respond. POST to:
@@ -123,6 +125,7 @@ await fetch("${baseUrl}/api/events", {
                 size="sm"
                 className="h-6 w-6 p-0"
                 onClick={() => copyToClipboard(`${baseUrl}/api/events`, "endpoint")}
+                aria-label="Copy endpoint URL"
               >
                 {copied === "endpoint" ? (
                   <Check className="w-3 h-3 text-green-400" />
@@ -144,6 +147,7 @@ await fetch("${baseUrl}/api/events", {
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
                 onClick={() => copyToClipboard(curlExample, "curl")}
+                aria-label="Copy cURL example"
               >
                 {copied === "curl" ? (
                   <Check className="w-3 h-3 text-green-400" />
@@ -165,6 +169,7 @@ await fetch("${baseUrl}/api/events", {
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
                 onClick={() => copyToClipboard(pythonExample, "python")}
+                aria-label="Copy Python example"
               >
                 {copied === "python" ? (
                   <Check className="w-3 h-3 text-green-400" />
@@ -186,6 +191,7 @@ await fetch("${baseUrl}/api/events", {
                 size="sm"
                 className="absolute top-2 right-2 h-6 w-6 p-0"
                 onClick={() => copyToClipboard(jsExample, "js")}
+                aria-label="Copy JavaScript example"
               >
                 {copied === "js" ? (
                   <Check className="w-3 h-3 text-green-400" />
