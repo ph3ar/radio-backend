@@ -1,0 +1,3 @@
+## 2024-04-09 - Remove O(N) Object Mapping from Animation Loop
+**Learning:** Found a major bottleneck in `components/audio-visualizer.tsx`. A mapped array was being wrapped in `Set` allocation inside the 60fps `requestAnimationFrame` draw loop: `const uniqueRobots = [...new Set(events.map(e => e.robot_id))]`. This triggered O(N) mapping, memory allocation, and GC overhead unnecessarily on every tick.
+**Action:** Always move static or dependency-based calculations outside animation and render loops. Perform the computation only once per render/effect (e.g. before the `requestAnimationFrame` definition).
